@@ -1,0 +1,73 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      =  env("DATABASE_URL")
+}
+
+model Message {
+  id           String        @id @default(auto()) @map("_id") @db.ObjectId
+  messageId    String        @unique
+  roomId       String
+  senderId     String        @db.ObjectId
+  message      String
+  type         MessageType   @default(TEXT)
+  fileUrl      String?
+  success      Boolean       @default(true)
+  seenByRefId  String?       @db.ObjectId
+  seenBy       MessageSeen?  @relation(fields: [seenByRefId], references: [id])
+  editHistory  EditHistory[]
+  source       MessageSource
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+
+  @@index([roomId, createdAt(sort: Desc)])
+}
+
+model EditHistory {
+  id              String   @id @default(auto()) @map("_id") @db.ObjectId
+  editedAt        DateTime
+  previousContent String
+  messageId       String   @db.ObjectId
+  message         Message  @relation(fields: [messageId], references: [id])
+}
+
+model MessageSeen {
+  id      String    @id @default(auto()) @map("_id") @db.ObjectId
+  message Message[]
+}
+
+model User {
+  id              String   @id @default(auto()) @map("_id") @db.ObjectId
+  username        String   @unique
+  email           String   @unique
+  password        String
+  profilePicture  String?
+  role            Role     @default(USER)
+  verified        Boolean  @default(false)
+  verifyCode      String?
+  verifyCodeExpiry DateTime?
+  isLoggedIn      Boolean  @default(false)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+enum MessageType {
+  TEXT
+  IMAGE
+  VIDEO
+  FILE
+}
+
+enum MessageSource {
+  WEB
+  MOBILE
+  API
+}
+
+enum Role {
+  USER
+  ADMIN
+}
