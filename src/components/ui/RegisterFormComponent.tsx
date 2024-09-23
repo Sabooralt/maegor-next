@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useFormik } from "formik";
-import * as Yup from "yup";
+import * as z from "zod";
 import { toast } from "sonner";
 import { useEffect, useState } from "react";
 import { Check, LoaderCircle, X } from "lucide-react";
@@ -11,13 +11,11 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { checkUsername } from "../../../actions/checkUsername";
 import { LogoSvg } from "./logoSvg";
-
-interface SignupFormValues {
-  username: string;
-  email: string;
-  password: string;
-  confirmPassword: string;
-}
+import { RegisterSchema } from "../../../schemas";
+import { PrimaryButton } from "./primary-button";
+import { OrSeparator } from "./or-separator";
+import { FaGoogle } from "react-icons/fa";
+import GoogleButton from "../auth/googleButton";
 
 export const RegisterForm = () => {
   const [loading, setLoading] = useState<boolean>(false);
@@ -28,34 +26,30 @@ export const RegisterForm = () => {
   const [username, setUsername] = useState<string>("");
   const router = useRouter();
 
-  const formik = useFormik<SignupFormValues>({
+  const formik = useFormik<z.infer<typeof RegisterSchema>>({
     initialValues: {
       username: "",
       email: "",
       password: "",
       confirmPassword: "",
     },
-    validationSchema: Yup.object({
-      username: Yup.string()
-        .trim()
-        .required("Username is required.")
-        .min(3, "Username must be at least 3 characters.")
-        .max(20, "Username must not exceed 20 characters.")
-        .transform((value) => (value ? value.toLowerCase() : value)),
-      email: Yup.string()
-        .trim()
-        .email("Invalid email address")
-        .required("Email is required."),
-      password: Yup.string()
-        .trim()
-        .required("Password is required.")
-        .min(6, "Password must be at least 6 characters."),
-      confirmPassword: Yup.string()
-        .trim()
-        .oneOf([Yup.ref("password")], "Passwords must match.")
-        .required("Confirm Password is required."),
-    }),
-    onSubmit: async (values) => {
+    validate: (values) => {
+      try {
+        RegisterSchema.parse(values);
+        return {};
+      } catch (error) {
+        if (error instanceof z.ZodError) {
+          const formikErrors: Record<string, string> = {};
+          error.errors.forEach((err) => {
+            if (err.path.length > 0) {
+              formikErrors[err.path[0]] = err.message;
+            }
+          });
+          return formikErrors;
+        }
+      }
+    },
+    onSubmit: async (values: z.infer<typeof RegisterSchema>) => {
       try {
         const response = await fetch("/api/auth/register", {
           method: "POST",
@@ -63,7 +57,7 @@ export const RegisterForm = () => {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            username: values.username,
+            name: values.username,
             email: values.email,
             password: values.password,
           }),
@@ -75,6 +69,7 @@ export const RegisterForm = () => {
           toast.success("Account Created!", {
             description: "Please log in with your new account.",
           });
+          formik.resetForm();
           router.push("/auth/login");
         } else {
           toast.error(data.message || "An error occurred.");
@@ -114,12 +109,18 @@ export const RegisterForm = () => {
   }, [username]);
 
   return (
-    <div className="grid pt-20 pb-3 size-full px-10 lg:px-20 xl:px-32">
+    <div className="grid pt-20 pb-3 size-full px-10 lg:px-20 ">
       <div className="grid gap-0">
-        <div className="grid gap-2">
+        <div className="grid gap-4">
           <h1 className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 via-pink-500 to-purple-600">
             Sign Up
           </h1>
+
+          <div className="w-full">
+            <GoogleButton />
+
+            <OrSeparator />
+          </div>
 
           <form onSubmit={formik.handleSubmit} className="grid gap-2">
             <div className="grid gap-2">
@@ -225,7 +226,7 @@ export const RegisterForm = () => {
               </div>
             </div>
 
-            <div className="grid gap-1 py-5">
+            <div className="grid gap-5 py-5">
               <Button
                 type="submit"
                 disabled={
@@ -235,36 +236,40 @@ export const RegisterForm = () => {
                   (usernameStatus && !usernameStatus.success) ||
                   loading
                 }
-                className="bg-gradient-to-r hover:to-[#BF29F0] text-base drop-shadow-md from-indigo-700 to-purple-700 text-white flex gap-1"
+                className="bg-white  text-black drop-shadow-md text-base font-medium border border-black/15"
+                variant="secondary"
               >
                 {formik.isSubmitting && (
-                  <LoaderCircle className="animate-spin size-5" />
+                  <LoaderCircle className="animate-spin mr-1 size-5" />
                 )}
-                Sign Up
+
+                {formik.isSubmitting ? "Signing up..." : "Sign up"}
               </Button>
 
               <div className="mx-auto font-geist flex gap-1 font-normal">
                 <p>Already have an account?</p>
                 <Link
                   href="/auth/login"
-                  className="underline underline-offset-4 text-indigo-800"
+                  className="underline underline-offset-1 text-indigo-700"
                 >
                   Log in
                 </Link>
               </div>
+              <div className="flex mt-auto mx-auto opacity-50 flex-col items-center justify-center">
+                <LogoSvg />
+                <small>
+                  © 2024 Maegor | Developed by{" "}
+                  <a
+                    className="underline"
+                    href="https://saboordev.netlify.app/"
+                  >
+                    Saboor
+                  </a>
+                </small>
+              </div>
             </div>
           </form>
         </div>
-      </div>
-
-      <div className="flex mt-auto mx-auto opacity-50 flex-col items-center justify-center">
-        <LogoSvg/>
-        <small>
-          © 2024 Maegor | Developed by{" "}
-          <a className="underline" href="https://saboordev.netlify.app/">
-            Saboor
-          </a>
-        </small>
       </div>
     </div>
   );

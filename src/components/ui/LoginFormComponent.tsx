@@ -3,62 +3,96 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useFormik } from "formik";
-import * as Yup from "yup";
 import { toast } from "sonner";
-import { useState } from "react";
 import { LoaderCircle } from "lucide-react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { LogoSvg } from "./logoSvg";
-import { signIn } from "next-auth/react";
+import { LoginSchema } from "../../../schemas";
+import { login } from "../../../actions/login";
+import { useState, useTransition } from "react";
+import * as z from "zod";
+import Social from "../auth/googleButton";
+import { FormError } from "./form/form-error";
+import { PrimaryButton } from "./primary-button";
+import { FaGoogle } from "react-icons/fa";
+import { OrSeparator } from "./or-separator";
+import GoogleButton from "../auth/googleButton";
 
-interface SigninFormValues {
-  email: string;
-  password: string;
-}
+// Define the types for the form values
 
 export const LoginForm = () => {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const urlError =
+    searchParams.get("error") === "OAuthAccountNotLinked"
+      ? "Email already in use with a different provider!"
+      : "";
+  const [isPending, startTransition] = useTransition();
+  const [showTwoFactor, setShowTwoFactor] = useState(false);
+  const [formError, setFormError] = useState<string | undefined>("");
 
-  const formik = useFormik<SigninFormValues>({
+  const formik = useFormik<z.infer<typeof LoginSchema>>({
     initialValues: {
       email: "",
       password: "",
+      code: "",
     },
-    validationSchema: Yup.object({
-      email: Yup.string()
-        .trim()
-        .email("Invalid email address")
-        .required("Email is required."),
-      password: Yup.string().trim().required("Password is required."),
-    }),
-    onSubmit: async (values) => {
+    validate: (values) => {
       try {
-        const res = await signIn("credentials", {
-          redirect: false, // Prevents auto redirection
-          email: values.email,
-          password: values.password,
-        });
-
-        if (res?.error) {
-          toast.error(res.error);
-        } else {
-          router.push("/");
-          toast.success("Log in successfull.");
-        }
+        LoginSchema.parse(values);
+        return {};
       } catch (error) {
-        toast.error("An error occurred. Please try again later.");
-      } 
+        if (error instanceof z.ZodError) {
+          const formikErrors: Record<string, string> = {};
+          error.errors.forEach((err) => {
+            if (err.path.length > 0) {
+              formikErrors[err.path[0]] = err.message;
+            }
+          });
+          return formikErrors;
+        }
+      }
+    },
+    onSubmit: async (values: z.infer<typeof LoginSchema>) => {
+      setFormError("");
+      startTransition(() => {
+        login(values)
+          .then((data) => {
+            if (data?.success) {
+              toast.success(data.success);
+              formik.resetForm();
+            }
+            if (data?.error) {
+              setFormError(data?.error);
+              toast.error(data?.error);
+            }
+            if (data?.twoFactor) {
+              formik.resetForm();
+              setShowTwoFactor(true);
+            }
+          })
+          .catch(() => {
+            setFormError("An error occured!");
+            toast.error("An error occured!");
+          });
+      });
     },
   });
 
   return (
-    <div className="grid pt-20 pb-3 size-full px-10 lg:px-20 xl:px-32">
+    <div className="grid pt-20 pb-3 size-full px-10 lg:px-20">
       <div className="grid gap-0">
-        <div className="grid gap-2">
+        <div className="grid gap-1">
           <h1 className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 via-pink-500 to-purple-600">
             Sign in
           </h1>
+
+          <div className="w-full">
+           <GoogleButton/>
+
+            <OrSeparator />
+          </div>
 
           <form onSubmit={formik.handleSubmit} className="grid gap-2">
             <div className="grid gap-2">
@@ -93,42 +127,49 @@ export const LoginForm = () => {
               </div>
             </div>
 
-            <div className="grid gap-1 py-5">
+            <FormError message={formError || urlError} />
+
+            <div className="grid gap-4 py-5">
               <Button
                 type="submit"
                 disabled={
-                  !formik.isValid || formik.isSubmitting || !formik.dirty
+                  !formik.isValid ||
+                  formik.isSubmitting ||
+                  !formik.dirty ||
+                  isPending
                 }
-                className="bg-gradient-to-r hover:to-[#BF29F0] text-base drop-shadow-md from-indigo-700 to-purple-700 text-white flex gap-1"
+                className="bg-white text-black drop-shadow-md text-base font-medium border border-black/15"
+                variant="secondary"
               >
-                {formik.isSubmitting && (
-                  <LoaderCircle className="animate-spin size-5" />
-                )}
-                Sign Up
+                {isPending && <LoaderCircle className="animate-spin size-5" />}
+                {isPending ? "Signing in..." : "Sign in"}
               </Button>
 
               <div className="mx-auto font-geist flex gap-1 font-normal">
                 <p>Don't have an account?</p>
                 <Link
-                  href="/auth/signin"
+                  href="/auth/register"
                   className="underline underline-offset-4 text-indigo-800"
                 >
                   Sign up
                 </Link>
               </div>
+
+              <div className="flex mt-auto mx-auto opacity-50 flex-col items-center justify-center">
+                <LogoSvg />
+                <small>
+                  © 2024 Maegor | Developed by
+                  <a
+                    className="underline"
+                    href="https://saboordev.netlify.app/"
+                  >
+                    Saboor
+                  </a>
+                </small>
+              </div>
             </div>
           </form>
         </div>
-      </div>
-
-      <div className="flex mt-auto mx-auto opacity-50 flex-col items-center justify-center">
-        <LogoSvg />
-        <small>
-          © 2024 Maegor | Developed by
-          <a className="underline" href="https://saboordev.netlify.app/">
-            Saboor
-          </a>
-        </small>
       </div>
     </div>
   );

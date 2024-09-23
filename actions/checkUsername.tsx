@@ -16,10 +16,13 @@ export async function checkUsername(
     }
 
     const existingUser = await prisma.user.findUnique({
-      where: { username: sanitizedUsername },
+      where: { name: sanitizedUsername },
     });
 
-    if (existingUser) {
+    if (
+      existingUser &&
+      existingUser.name.toLocaleLowerCase() === sanitizedUsername
+    ) {
       return { available: false, message: "This username is already taken" };
     }
 

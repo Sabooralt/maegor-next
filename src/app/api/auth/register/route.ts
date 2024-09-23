@@ -6,20 +6,20 @@ const prisma = new PrismaClient();
 
 export async function POST(req: Request) {
   try {
-    const { username, email, password } = await req.json();
+    const { name, email, password } = await req.json();
 
-    if (!username || !email || !password) {
+    if (!name || !email || !password) {
       return new NextResponse("Missing fields", { status: 400 });
     }
 
-    const UsernameExist = await prisma.user.findUnique({
+    const nameExist = await prisma.user.findUnique({
       where: {
-        username,
+        name,
       },
     });
-    if (UsernameExist) {
+    if (nameExist) {
       return NextResponse.json(
-        { message: "Username not available!" },
+        { message: "name not available!" },
         { status: 409 }
       );
     }
@@ -40,7 +40,7 @@ export async function POST(req: Request) {
 
     const user = await prisma.user.create({
       data: {
-        username,
+        name,
         email,
         password: hashedPassword,
       },
