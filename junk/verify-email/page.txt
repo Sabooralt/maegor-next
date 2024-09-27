@@ -5,16 +5,15 @@ import {
   InputOTPSlot,
 } from "@/components/ui/input-otp";
 import { Button } from "@/components/ui/button";
-import { useEffect, useRef, useState, useTransition } from "react";
+import { useState, useTransition } from "react";
 import { toast } from "sonner";
 import { Logo } from "@/components/ui/Logo";
 import { useRouter } from "next/navigation";
-import { SmallLoading } from "@/components/ui/small-loading";
 import { LoaderCircle } from "lucide-react";
 import { useResendTimer } from "@/hooks/useResendTimer";
 import Image from "next/image";
 import axios from "axios";
-import { auth } from "../../../auth";
+import { auth } from "../../auth";
 
 const VerifyEmail = async () => {
   const router = useRouter();
@@ -51,7 +50,7 @@ const VerifyEmail = async () => {
           }
         });
       }
-    } catch (err: any) {
+    } catch (err) {
       if (err.response) {
         toast.error("An error occurred.", {
           description: err.response.data.message,

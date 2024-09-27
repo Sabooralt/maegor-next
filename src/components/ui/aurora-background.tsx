@@ -2,7 +2,7 @@ import { cn } from "@/lib/utils";
 import React from "react";
 
 interface AuroraProps {
-  className?: String;
+  className?: string;
   children?: React.ReactNode;
   showRadialGradient?: boolean;
 }

@@ -6,23 +6,19 @@ import { useFormik } from "formik";
 import { toast } from "sonner";
 import { LoaderCircle } from "lucide-react";
 import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { LogoSvg } from "./logoSvg";
 import { LoginSchema } from "../../../schemas";
 import { login } from "../../../actions/login";
 import { useState, useTransition } from "react";
 import * as z from "zod";
-import Social from "../auth/googleButton";
-import { FormError } from "./form/form-error";
-import { PrimaryButton } from "./primary-button";
-import { FaGoogle } from "react-icons/fa";
-import { OrSeparator } from "./or-separator";
 import GoogleButton from "../auth/googleButton";
+import { OrSeparator } from "./or-separator";
+import { FormError } from "./form/form-error";
 
 // Define the types for the form values
 
 export const LoginForm = () => {
-  const router = useRouter();
   const searchParams = useSearchParams();
   const urlError =
     searchParams.get("error") === "OAuthAccountNotLinked"
@@ -89,7 +85,7 @@ export const LoginForm = () => {
           </h1>
 
           <div className="w-full">
-           <GoogleButton/>
+            <GoogleButton />
 
             <OrSeparator />
           </div>

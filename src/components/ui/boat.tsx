@@ -1,5 +1,6 @@
 "use client";
 import { motion } from "framer-motion";
+import Image from "next/image";
 
 export const Boat = () => {
   return (
@@ -15,10 +16,22 @@ export const Boat = () => {
           ease: "easeInOut",
         }}
       >
-        <img alt="Boat SVG" src="/svg/boat.svg" />
+        <Image
+          width={0}
+          height={0}
+          alt="Boat SVG"
+          className="size-full"
+          src="/svg/boat.svg"
+        />
       </motion.div>
       <div className="relative bottom-4">
-        <img alt="Waves SVG" src="/svg/waves.svg" />
+        <Image
+          width={0}
+          height={0}
+          alt="Waves SVG"
+          className="size-full"
+          src="/svg/waves.svg"
+        />
       </div>
     </>
   );

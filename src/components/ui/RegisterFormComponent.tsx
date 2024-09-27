@@ -12,9 +12,7 @@ import { useRouter } from "next/navigation";
 import { checkUsername } from "../../../actions/checkUsername";
 import { LogoSvg } from "./logoSvg";
 import { RegisterSchema } from "../../../schemas";
-import { PrimaryButton } from "./primary-button";
 import { OrSeparator } from "./or-separator";
-import { FaGoogle } from "react-icons/fa";
 import GoogleButton from "../auth/googleButton";
 
 export const RegisterForm = () => {

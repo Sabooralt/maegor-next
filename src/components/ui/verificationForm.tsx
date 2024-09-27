@@ -57,7 +57,7 @@ const NewVerificationForm = () => {
     return () => {
       clearTimeout(interval);
     };
-  }, [success, message]);
+  }, [success, message, router]);
 
   return (
     <Card>

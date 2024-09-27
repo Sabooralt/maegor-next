@@ -1,12 +1,11 @@
 import { Button } from "@/components/ui/button";
 import { auth, signOut } from "../../../../auth";
-import { logout } from "../../../../actions/logout";
 
 const Settings = async () => {
   const session = await auth();
   return (
     <div className="w-full h-screen grid place-items-center bg-red-200">
-      <h1 className="text-4xl">run properply  die young lets live forever</h1>
+      <h1 className="text-4xl">run properply die young lets live forever</h1>
 
       <form
         action={async () => {
