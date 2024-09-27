@@ -143,7 +143,7 @@ export const LoginForm = () => {
               </Button>
 
               <div className="mx-auto font-geist flex gap-1 font-normal">
-                <p>Don't have an account?</p>
+                <p>Don&apos;t have an account?</p>
                 <Link
                   href="/auth/register"
                   className="underline underline-offset-4 text-indigo-800"
