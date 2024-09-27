@@ -5,7 +5,7 @@ export const LogoSvg = ({ color }: { color?: string }) => {
         stroke: "#fff",
         strokeWidth: 2,
         strokeLinejoin: "miter",
-        strokeLinecap: "miter",
+        strokeLinecap: "butt",
       }}
       viewBox="0 0 786 808"
       className="size-[50px] rotate-45"
