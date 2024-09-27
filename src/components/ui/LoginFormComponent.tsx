@@ -123,6 +123,7 @@ export const LoginForm = () => {
               </div>
             </div>
 
+            {showTwoFactor && <div className="grid gap-2">Two factor</div>}
             <FormError message={formError || urlError} />
 
             <div className="grid gap-4 py-5">
