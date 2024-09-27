@@ -14,7 +14,7 @@ export async function GET(req: Request) {
   });
 
   if (user) {
-    return NextResponse.json({ isVerified: user.verified });
+    return NextResponse.json({ isVerified: user.emailVerified });
   } else {
     return NextResponse.json({ error: "User not found" }, { status: 400 });
   }
