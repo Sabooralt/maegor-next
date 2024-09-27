@@ -26,7 +26,7 @@ export const newVerification = async (token: string) => {
   await prisma.user.update({
     where: { id: existingUser.id },
     data: {
-      verified: new Date(),
+      emailVerified: new Date(),
       email: existingToken.email,
     },
   });
@@ -35,5 +35,8 @@ export const newVerification = async (token: string) => {
     where: { id: existingToken.id },
   });
 
-  return { success: "Email verified!" };
+  return {
+    success: "Email verified!",
+    message: "Redirecting you back to the home page!",
+  };
 };

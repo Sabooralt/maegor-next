@@ -5,8 +5,8 @@ import { logout } from "../../../../actions/logout";
 const Settings = async () => {
   const session = await auth();
   return (
-    <div className="w-full h-screen grid place-items-center bg-slate-200">
-      <h1 className="text-4xl">This is the settings page.</h1>
+    <div className="w-full h-screen grid place-items-center bg-red-200">
+      <h1 className="text-4xl">run properply  die young lets live forever</h1>
 
       <form
         action={async () => {
