@@ -34,6 +34,6 @@ export const AuroraBackground = ({
         </div>
         {children}
       </div>
-    </main>
+    </main> 
   );
 };

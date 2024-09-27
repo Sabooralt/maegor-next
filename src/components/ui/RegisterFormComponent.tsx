@@ -248,6 +248,7 @@ export const RegisterForm = () => {
                 <p>Already have an account?</p>
                 <Link
                   href="/auth/login"
+                  shallow
                   className="underline underline-offset-1 text-indigo-700"
                 >
                   Log in

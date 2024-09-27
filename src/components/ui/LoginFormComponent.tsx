@@ -146,6 +146,7 @@ export const LoginForm = () => {
                 <p>Don&apos;t have an account?</p>
                 <Link
                   href="/auth/register"
+                  shallow
                   className="underline underline-offset-4 text-indigo-800"
                 >
                   Sign up

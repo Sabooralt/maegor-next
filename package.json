@@ -4,9 +4,11 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "vercel-build": "prisma generate && next build",
     "postinstall": "prisma generate",
     "build": "next build",
     "start": "next start",
+    "analyze": "next analyze",
     "lint": "next lint"
   },
   "dependencies": {

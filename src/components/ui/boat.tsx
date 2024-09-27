@@ -19,6 +19,7 @@ export const Boat = () => {
         <Image
           width={0}
           height={0}
+          fetchPriority="high"
           alt="Boat SVG"
           className="size-full"
           src="/svg/boat.svg"
@@ -28,6 +29,7 @@ export const Boat = () => {
         <Image
           width={0}
           height={0}
+          fetchPriority="high"
           alt="Waves SVG"
           className="size-full"
           src="/svg/waves.svg"

@@ -7,6 +7,8 @@ import { useSession } from "next-auth/react";
 import { ChatBubbleIcon } from "@radix-ui/react-icons";
 import { Navbar } from "@/components/ui/navbar";
 
+export const dynamic = "force-static";
+
 function Introduction() {
   const { data } = useSession();
 
